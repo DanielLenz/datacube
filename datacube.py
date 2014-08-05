@@ -1,4 +1,4 @@
-import astropy.io as apyio
+from astropy.io import fits
 import astropy.wcs as apywcs
 
 class Datacube(object):
@@ -14,7 +14,7 @@ class Datacube(object):
 
     header : 
 
-    
+
     Returns
     -------
 
@@ -26,18 +26,26 @@ class Datacube(object):
     _dtype = None
 
     def __init__(self, path=None, data=None, header=None, **kwargs):
-
+        
+        self._dtype = kwargs.get('dtype', np.float32)
+        
         if path is not None:
             """
             PyFITS open
             """
-        else:
+
+            self.data, self.header = fits.get_data(path, header=True)
+
+        elif (data is not None) and (header is not None):
             """
             Use provided data
             """
-
-        self._dtype = kwargs.get('dtype', np.float32)
-
+            self.data = data
+            self.header = header
+        
+        else:
+            raise AttributeError("Either path or data and header have to be set.")
+        
 
     def _set_data(self, data):
         self._data = np.array(data, dtype=self._dtype)
@@ -47,17 +55,13 @@ class Datacube(object):
 
     data = property(_get_data, _set_data)
 
-
-
     def _set_header(self, header):
-        pass
+        self._header = header
 
     def _get_header(self):
-        pass
+        return self._header
 
     header = property(_get_header, _set_header)
-
-
 
     def _get_projection(self):
         if self._projection is None:
@@ -76,3 +80,7 @@ class Datacube(object):
 
     def moment(self, vslice=None, cslice=None, kind=[0], mask=None):
         pass
+
+
+
+
