@@ -109,7 +109,7 @@ class Datacube(object):
             mask = mask[None]
         
         if vslice is not None:
-            cslice = self.spec_wcs.wcs_world2pix(vslice, 0)
+            cslice = self.spec_wcs.wcs_world2pix(vslice, 0)[-1]
 
         if cslice is not None:
             cslice = [int(f(c)) for f,c in it.izip([np.floor, np.ceil], cslice)]
@@ -119,6 +119,6 @@ class Datacube(object):
                 return np.sum(self.data[data_slice] * mask, 0)
 
             if kind == 1:
-                m = np.sum(self.data[data_slice] * self.velocities[data_slice] * mask, 0)
+                m = np.sum(self.data[data_slice] * self.velocities[data_slice][:,None,None] * mask, 0)
                 m /= np.sum(self.data[data_slice] * mask, 0)
                 return m
