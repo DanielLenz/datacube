@@ -71,6 +71,7 @@ class Datacube(object):
 
     header = property(_get_header, _set_header)
 
+    
     def _get_wcs(self):
         if self._wcs is None:
             self._wcs = apywcs.WCS(self.header)
@@ -78,6 +79,13 @@ class Datacube(object):
 
     wcs = property(_get_wcs)
 
+    
+    def _get_spec_wcs(self):
+        return self.wcs.sub(['spectral'])
+
+    spec_wcs = property(_get_spec_wcs)
+
+    
     def _get_velocities(self):
         if (self._velocities is None) or self._calculate_velocities:
             wcs_sub = self.wcs.sub(['spectral'])
@@ -95,7 +103,6 @@ class Datacube(object):
 
     def moment(self, vslice=None, cslice=None, kind=[0], mask=None):
         pass
-
 
 
 
