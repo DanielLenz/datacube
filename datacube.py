@@ -19,11 +19,14 @@ class Datacube(object):
     -------
 
     """
-    _projection = None
+    _wcs = None
     _data = None
     _header = None
 
     _dtype = None
+
+    _calculate_velocities = False
+    _velocities = None
 
     def __init__(self, path=None, data=None, header=None, **kwargs):
         
@@ -34,7 +37,7 @@ class Datacube(object):
             PyFITS open
             """
 
-            self.data, self.header = fits.get_data(path, header=True)
+            self.data, self.header = fits.getdata(path, header=True)
 
         elif (data is not None) and (header is not None):
             """
@@ -56,24 +59,33 @@ class Datacube(object):
     data = property(_get_data, _set_data)
 
     def _set_header(self, header):
+        self._calculate_velocities = True
         self._header = header
+        self._header['CTYPE3'] = 'VRAD'
+        self._header['SPECSYS'] = 'LSRK'
+
 
     def _get_header(self):
         return self._header
 
     header = property(_get_header, _set_header)
 
-    def _get_projection(self):
-        if self._projection is None:
-            self._projection = apywcs.WCS(self.header)
-        return self._projection
+    def _get_wcs(self):
+        if self._wcs is None:
+            self._wcs = apywcs.WCS(self.header)
+        return self._wcs
 
-    projection = property(_get_projection)
-
-
+    wcs = property(_get_wcs)
 
     def _get_velocities(self):
-        pass
+        if (self._velocities is None) or self._calculate_velocities:
+            wcs_sub = wcs.sub(['spectral'])
+
+            self._velocities = wcs_sub.wcs_pix2world(np.arange(data.shape[0]), 0) / 1000.
+            self._calculate_velocities = False
+            
+        return self._velocities
+        
 
     velocities = property(_get_velocities)
 
