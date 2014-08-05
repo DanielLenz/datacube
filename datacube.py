@@ -107,17 +107,17 @@ class Datacube(object):
         if vslice is not None:
             cslice = self.spec_wcs.wcs_world2pix(vslice, 0)[-1]
 
-        cslice = [int(f(c)) for f,c in it.izip([np.floor, np.ceil], cslice)]
-        data_slice = slice(*cslice)
-
-        if mask is None:
-            mask = 1.
-        elif mask.shape == self.data.shape[1:]:
-            mask = mask[None]
-        elif mask.shape == self.data.shape:
-            mask = mask[data_slice]
-
         if cslice is not None:
+
+            cslice = [int(f(c)) for f,c in it.izip([np.floor, np.ceil], cslice)]
+            data_slice = slice(*cslice)
+
+            if mask is None:
+                mask = 1.
+            elif mask.shape == self.data.shape[1:]:
+                mask = mask[None]
+            elif mask.shape == self.data.shape:
+                mask = mask[data_slice]
 
             s_data = self.data[data_slice]
 
