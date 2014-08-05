@@ -1,3 +1,5 @@
+import numpy as np
+
 from astropy.io import fits
 import astropy.wcs as apywcs
 
@@ -64,7 +66,6 @@ class Datacube(object):
         self._header['CTYPE3'] = 'VRAD'
         self._header['SPECSYS'] = 'LSRK'
 
-
     def _get_header(self):
         return self._header
 
@@ -79,11 +80,13 @@ class Datacube(object):
 
     def _get_velocities(self):
         if (self._velocities is None) or self._calculate_velocities:
-            wcs_sub = wcs.sub(['spectral'])
+            wcs_sub = self.wcs.sub(['spectral'])
 
-            self._velocities = wcs_sub.wcs_pix2world(np.arange(data.shape[0]), 0) / 1000.
+            # unsafe, depends on proper alignment of axes
+            channels = np.arange(self.data.shape[0])
+            self._velocities = wcs_sub.wcs_pix2world(channels, 0)[0]
             self._calculate_velocities = False
-            
+
         return self._velocities
         
 
