@@ -2,7 +2,23 @@ import astropy.io as apyio
 import astropy.wcs as apywcs
 
 class Datacube(object):
+    """
+    RTFM
 
+    Input
+    -----
+
+    path : 
+
+    data : 
+
+    header : 
+
+    
+    Returns
+    -------
+
+    """
     _projection = None
     _data = None
     _header = None
