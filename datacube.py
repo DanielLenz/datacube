@@ -86,7 +86,6 @@ class Datacube(object):
         return self.wcs.sub(['spectral'])
 
     spec_wcs = property(_get_spec_wcs)
-
     
     def _get_velocities(self):
         if (self._velocities is None) or self._calculate_velocities:
@@ -122,3 +121,5 @@ class Datacube(object):
                 m = np.sum(self.data[data_slice] * self.velocities[data_slice][:,None,None] * mask, 0)
                 m /= np.sum(self.data[data_slice] * mask, 0)
                 return m
+
+
