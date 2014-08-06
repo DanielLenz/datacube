@@ -4,7 +4,7 @@ import numpy as np
 
 from astropy.io import fits
 import astropy.wcs as apywcs
-
+from astropy import units as u
 
 class Datacube(object):
 
@@ -145,5 +145,6 @@ class EBHISDatacube(Datacube):
 
         super(EBHISDatacube, self).__init__(*args, **kwargs)
 
+        self._hud.header['CUNIT3'] = 'm'
         self._hdu.header['CTYPE3'] = 'VRAD'
         self._hdu.header['SPECSYS'] = 'LSRK'
