@@ -102,24 +102,33 @@ class Datacube(object):
 
     def moment(self, vslice=None, cslice=None, kind=0, mask=None):
 
-        if mask is None:
-            mask = 1.
-        elif mask.shape == self.data.shape[1:]:
-            mask = mask[None]
         
         if vslice is not None:
             cslice = self.spec_wcs.wcs_world2pix(vslice, 0)[-1]
 
         if cslice is not None:
+
             cslice = [int(f(c)) for f,c in it.izip([np.floor, np.ceil], cslice)]
             data_slice = slice(*cslice)
 
+            if mask is None:
+                mask = 1.
+            elif mask.shape == self.data.shape[1:]:
+                mask = mask[None]
+            elif mask.shape == self.data.shape:
+                mask = mask[data_slice]
+
+            s_data = self.data[data_slice]
+
             if kind == 0:
-                return np.sum(self.data[data_slice] * mask, 0)
+                return np.sum(s_data * mask, 0)
 
             if kind == 1:
-                m = np.sum(self.data[data_slice] * self.velocities[data_slice][:,None,None] * mask, 0)
-                m /= np.sum(self.data[data_slice] * mask, 0)
+
+                s_velocities = self.velocities[data_slice][:, None, None]
+
+                m = np.sum(s_data * s_velocities * mask, 0)
+                m /= np.sum(s_data * mask, 0)
                 return m
 
 
