@@ -24,8 +24,7 @@ class Datacube(object):
 
     """
     _wcs = None
-    _data = None
-    _header = None
+    _hdu = None
 
     _dtype = None
 
@@ -41,38 +40,38 @@ class Datacube(object):
             PyFITS open
             """
 
-            self.data, self.header = fits.getdata(path, header=True)
+            for h in fits.open(path):
+                if h.is_image:
+                    self._hdu = h
+                    break
 
         elif (data is not None) and (header is not None):
             """
             Use provided data
             """
-            self.data = data
-            self.header = header
-        
+
+            self.hdu = fits.ImageHDU(data=data, header=header)
+            
         else:
             raise AttributeError("Either path or data and header have to be set.")
-        
 
-    def _set_data(self, data):
-        self._data = np.array(data, dtype=self._dtype)
+        self._modify_header()
+        self._hdu.verify('fix')
 
     def _get_data(self):
-        return self._data
+        return self._hdu.data
 
-    data = property(_get_data, _set_data)
-
-    def _set_header(self, header):
-        self._calculate_velocities = True
-        self._header = header
-        self._header['CTYPE3'] = 'VRAD'
-        self._header['SPECSYS'] = 'LSRK'
+    data = property(_get_data)
 
     def _get_header(self):
-        return self._header
+        return self._hdu.header
 
-    header = property(_get_header, _set_header)
+    header = property(_get_header)
 
+    def _get_hdu(self):
+        return self._hdu
+
+    hdu = property(_get_hdu)
     
     def _get_wcs(self):
         if self._wcs is None:
@@ -80,7 +79,6 @@ class Datacube(object):
         return self._wcs
 
     wcs = property(_get_wcs)
-
     
     def _get_spec_wcs(self):
         return self.wcs.sub(['spectral'])
@@ -99,6 +97,8 @@ class Datacube(object):
 
     velocities = property(_get_velocities)
 
+    def _modify_header(self):
+        pass
 
     def moment(self, vslice=None, cslice=None, kind=0, mask=None):
 
@@ -121,14 +121,27 @@ class Datacube(object):
             s_data = self.data[data_slice]
 
             if kind == 0:
-                return np.sum(s_data * mask, 0)
+                return np.nansum(s_data * mask, 0)
 
             if kind == 1:
 
                 s_velocities = self.velocities[data_slice][:, None, None]
 
-                m = np.sum(s_data * s_velocities * mask, 0)
-                m /= np.sum(s_data * mask, 0)
+                m = np.nansum(s_data * s_velocities * mask, 0)
+                m /= np.nansum(s_data * mask, 0)
                 return m
+
+
+class EBHISDatacube(Datacube):
+
+    def _modify_header(self):
+        self._hdu.header['CTYPE3'] = 'VRAD'
+        self._hdu.header['SPECSYS'] = 'LSRK'
+
+
+
+
+
+
 
 
