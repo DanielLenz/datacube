@@ -56,6 +56,8 @@ class Datacube(object):
 
     
     def _get_data(self):
+        if self._hdu.data.dtype != self._dtype:
+            self._hdu.data = self._hdu.data.astype(self._dtype)
         return self._hdu.data
 
     data = property(_get_data)
