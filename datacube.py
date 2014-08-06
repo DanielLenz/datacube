@@ -30,6 +30,8 @@ class Datacube(object):
 
     _dtype = None
 
+    _axis_units = None
+
     _calculate_velocities = False
     _velocities = None
 
@@ -94,6 +96,10 @@ class Datacube(object):
 
     cel_wcs = property(_get_cel_wcs)
 
+
+    def _get_axis_units(self):
+        return [u.Unit(s) for s in self.wcs.wcs.cunit]
+
     
     def _get_velocities(self):
         if (self._velocities is None) or self._calculate_velocities:
@@ -145,6 +151,6 @@ class EBHISDatacube(Datacube):
 
         super(EBHISDatacube, self).__init__(*args, **kwargs)
 
-        self._hud.header['CUNIT3'] = 'm'
+        self._hud.header['CUNIT3'] = 'm/s'
         self._hdu.header['CTYPE3'] = 'VRAD'
         self._hdu.header['SPECSYS'] = 'LSRK'
