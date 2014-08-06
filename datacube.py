@@ -56,7 +56,9 @@ class Datacube(object):
             raise AttributeError("Either path or data and header have to be set.")
 
         self._modify_header()
-        self._hdu.verify('fix')
+        self._wcs = apywcs.WCS(self.header)
+
+        return None
 
     def _get_data(self):
         return self._hdu.data
@@ -74,8 +76,6 @@ class Datacube(object):
     hdu = property(_get_hdu)
     
     def _get_wcs(self):
-        if self._wcs is None:
-            self._wcs = apywcs.WCS(self.header)
         return self._wcs
 
     wcs = property(_get_wcs)
