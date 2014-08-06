@@ -88,6 +88,12 @@ class Datacube(object):
 
     spec_wcs = property(_get_spec_wcs)
 
+
+    def _get_cel_wcs(self):
+        return self.wcs.sub(['longitude', 'latitude'])
+
+    cel_wcs = property(_get_cel_wcs)
+
     
     def _get_velocities(self):
         if (self._velocities is None) or self._calculate_velocities:
