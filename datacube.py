@@ -38,9 +38,6 @@ class Datacube(object):
         self._dtype = kwargs.get('dtype', np.float32)
 
         if path is not None:
-            """
-            PyFITS open
-            """
 
             for h in fits.open(path):
                 if h.is_image:
@@ -48,9 +45,6 @@ class Datacube(object):
                     break
 
         elif (data is not None) and (header is not None):
-            """
-            Use provided data
-            """
 
             self._hdu = fits.ImageHDU(data=data, header=header)
 
