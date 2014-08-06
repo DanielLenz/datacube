@@ -5,7 +5,9 @@ import numpy as np
 from astropy.io import fits
 import astropy.wcs as apywcs
 
+
 class Datacube(object):
+
     """
     RTFM
 
@@ -32,9 +34,9 @@ class Datacube(object):
     _velocities = None
 
     def __init__(self, path=None, data=None, header=None, **kwargs):
-        
+
         self._dtype = kwargs.get('dtype', np.float32)
-        
+
         if path is not None:
             """
             PyFITS open
@@ -51,9 +53,10 @@ class Datacube(object):
             """
 
             self.hdu = fits.ImageHDU(data=data, header=header)
-            
+
         else:
-            raise AttributeError("Either path or data and header have to be set.")
+            raise AttributeError(
+                "Either path or data and header have to be set.")
 
         self._modify_header()
         self._wcs = apywcs.WCS(self.header)
@@ -74,17 +77,17 @@ class Datacube(object):
         return self._hdu
 
     hdu = property(_get_hdu)
-    
+
     def _get_wcs(self):
         return self._wcs
 
     wcs = property(_get_wcs)
-    
+
     def _get_spec_wcs(self):
         return self.wcs.sub(['spectral'])
 
     spec_wcs = property(_get_spec_wcs)
-    
+
     def _get_velocities(self):
         if (self._velocities is None) or self._calculate_velocities:
             # unsafe, depends on proper alignment of axes
@@ -93,7 +96,6 @@ class Datacube(object):
             self._calculate_velocities = False
 
         return self._velocities
-        
 
     velocities = property(_get_velocities)
 
@@ -102,13 +104,13 @@ class Datacube(object):
 
     def moment(self, vslice=None, cslice=None, kind=0, mask=None):
 
-        
         if vslice is not None:
             cslice = self.spec_wcs.wcs_world2pix(vslice, 0)[-1]
 
         if cslice is not None:
 
-            cslice = [int(f(c)) for f,c in it.izip([np.floor, np.ceil], cslice)]
+            cslice = [int(f(c))
+                      for f, c in it.izip([np.floor, np.ceil], cslice)]
             data_slice = slice(*cslice)
 
             if mask is None:
@@ -137,11 +139,3 @@ class EBHISDatacube(Datacube):
     def _modify_header(self):
         self._hdu.header['CTYPE3'] = 'VRAD'
         self._hdu.header['SPECSYS'] = 'LSRK'
-
-
-
-
-
-
-
-
