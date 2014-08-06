@@ -52,9 +52,6 @@ class Datacube(object):
             raise AttributeError(
                 "Either path or data and header have to be set.")
 
-        self._modify_header()
-        self._wcs = apywcs.WCS(self.header)
-
         return None
 
     
@@ -77,6 +74,8 @@ class Datacube(object):
 
     
     def _get_wcs(self):
+        if self._wcs is None:
+            self._wcs = apywcs.WCS(self.header)
         return self._wcs
 
     wcs = property(_get_wcs)
@@ -137,6 +136,10 @@ class Datacube(object):
 
 class EBHISDatacube(Datacube):
 
-    def _modify_header(self):
+
+    def __init__(self, *args, **kwargs):
+
+        super(EBHISDatacube, self).__init__(*args, **kwargs)
+
         self._hdu.header['CTYPE3'] = 'VRAD'
         self._hdu.header['SPECSYS'] = 'LSRK'
