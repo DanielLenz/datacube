@@ -52,7 +52,7 @@ class Datacube(object):
             Use provided data
             """
 
-            self.hdu = fits.ImageHDU(data=data, header=header)
+            self._hdu = fits.ImageHDU(data=data, header=header)
 
         else:
             raise AttributeError(
@@ -63,31 +63,37 @@ class Datacube(object):
 
         return None
 
+    
     def _get_data(self):
         return self._hdu.data
 
     data = property(_get_data)
 
+    
     def _get_header(self):
         return self._hdu.header
 
     header = property(_get_header)
 
+    
     def _get_hdu(self):
         return self._hdu
 
     hdu = property(_get_hdu)
 
+    
     def _get_wcs(self):
         return self._wcs
 
     wcs = property(_get_wcs)
 
+    
     def _get_spec_wcs(self):
         return self.wcs.sub(['spectral'])
 
     spec_wcs = property(_get_spec_wcs)
 
+    
     def _get_velocities(self):
         if (self._velocities is None) or self._calculate_velocities:
             # unsafe, depends on proper alignment of axes
@@ -99,9 +105,11 @@ class Datacube(object):
 
     velocities = property(_get_velocities)
 
+    
     def _modify_header(self):
         pass
 
+    
     def moment(self, vslice=None, cslice=None, kind=0, mask=None):
 
         if vslice is not None:
@@ -126,7 +134,6 @@ class Datacube(object):
                 return np.nansum(s_data * mask, 0)
 
             if kind == 1:
-
                 s_velocities = self.velocities[data_slice][:, None, None]
 
                 m = np.nansum(s_data * s_velocities * mask, 0)
