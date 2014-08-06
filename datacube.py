@@ -101,10 +101,6 @@ class Datacube(object):
     velocities = property(_get_velocities)
 
     
-    def _modify_header(self):
-        pass
-
-    
     def moment(self, vslice=None, cslice=None, kind=0, mask=None):
 
         if vslice is not None:
