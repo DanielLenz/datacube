@@ -9,22 +9,9 @@ from astropy import units as u
 class Datacube(object):
 
     """
-    RTFM
-
-    Input
-    -----
-
-    path : 
-
-    data : 
-
-    header : 
-
-
-    Returns
-    -------
-
+    Base class for spectral line data cubes
     """
+
     _wcs = None
     _hdu = None
 
@@ -32,7 +19,6 @@ class Datacube(object):
 
     _axis_units = None
 
-    _calculate_velocities = False
     _velocities = None
 
     def __init__(self, path=None, data=None, header=None, **kwargs):
@@ -98,7 +84,11 @@ class Datacube(object):
 
 
     def _get_axis_units(self):
-        return [u.Unit(s) for s in self.wcs.wcs.cunit]
+        if self._axis_units is None
+            self._axis_units = [u.Unit(s) for s in self.wcs.wcs.cunit]
+        return self._axis_units
+
+    axis_units = property(_get_axis_units)
 
     
     def _get_velocities(self):
