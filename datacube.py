@@ -163,6 +163,30 @@ class Datacube(object):
 class DatacubeMoments(object):
 
     def moment(self, vslice=None, cslice=None, kind=0, mask=None):
+        """
+        Make a moment map from either a velocity or channel slice
+
+        Parameters
+        ----------
+        vslice : flexible
+            Velocity slice as either a speed compatible Quantity with two values
+            or a two-element array_like with km/s values.
+
+        cslice : array_like
+            Channel slice to make the moment of.
+
+        kind : int
+            The type of moment to make. Supported are moment 0 and moment 1
+
+        mask : ndarray
+            2D (spatial) or 3D mask for moment creation.
+
+
+        Returns
+        -------
+        moment : ndarray
+            The requested moment of the data cube
+        """
 
         if vslice is not None:
             cslice, _ = self.radio_velocities_to_channels(vslice)
