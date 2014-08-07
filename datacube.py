@@ -110,8 +110,10 @@ class Datacube(object):
                 eq = u.doppler_radio(self.wcs.wcs.restfrq * u.Hz)
             elif 'VOPT' in self.wcs.wcs.ctype[specax]:
                 eq = u.doppler_optical(self.wcs.wcs.restfrq * u.Hz)
+            elif 'FREQ' in self.wcs.wcs.ctype[specax]:
+                eq = []
             else:
-                eq = []  # Hope for the best...
+                raise AttributeError('Unsupported spectral class {:s} in header.'.format(self.wcs.wcs.ctype[specax]))
 
             self._frequencies = specc.to(u.Hz, eq)
 
