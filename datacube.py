@@ -120,7 +120,6 @@ class Datacube(object):
 
         return self._frequencies
 
-
     def radio_velocities_to_channels(self, velocities):
         """
         Return the corresponding channels to the given radio velocities.
@@ -153,7 +152,8 @@ class Datacube(object):
         else:
             sorter = None
 
-        channels = np.searchsorted(self.radio_velocities.value, sv, sorter=sorter)
+        channels = np.searchsorted(
+            self.radio_velocities.value, sv, sorter=sorter)
 
         true_velocities = self.radio_velocities[channels]
 
