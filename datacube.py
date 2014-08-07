@@ -45,72 +45,64 @@ class Datacube(object):
         return None
 
     
-    def _get_data(self):
+    @property
+    def data(self):
         if self._hdu.data.dtype != self._dtype:
             self._hdu.data = self._hdu.data.astype(self._dtype)
         return self._hdu.data
 
-    data = property(_get_data)
-
     
-    def _get_header(self):
+    @property
+    def header(self):
         return self._hdu.header
 
-    header = property(_get_header)
-
     
-    def _get_hdu(self):
+    @property
+    def hdu(self):
         return self._hdu
 
-    hdu = property(_get_hdu)
-
     
-    def _get_wcs(self):
+    @property
+    def wcs(self):
         if self._wcs is None:
             self._wcs = apywcs.WCS(self.header)
         return self._wcs
 
-    wcs = property(_get_wcs)
-
     
-    def _get_spec_wcs(self):
+    @property
+    def spec_wcs(self):
         return self.wcs.sub(['spectral'])
 
-    spec_wcs = property(_get_spec_wcs)
 
-
-    def _get_cel_wcs(self):
+    @property
+    def cel_wcs(self):
         return self.wcs.sub(['longitude', 'latitude'])
 
-    cel_wcs = property(_get_cel_wcs)
 
-
-    def _get_axis_units(self):
+    @property
+    def axis_units(self):
         if self._axis_units is None:
             self._axis_units = [u.Unit(s) for s in self.wcs.wcs.cunit]
         return self._axis_units
 
-    axis_units = property(_get_axis_units)
 
-
-    def _get_radio_velocities(self):
+    @property
+    def radio_velocities(self):
         if self._radio_velocities is None:
             rad_eq = u.doppler_radio(self.wcs.wcs.restfrq * u.Hz)
             self._radio_velocities = self.frequencies.to(u.km / u.s, rad_eq)
 
         return self._radio_velocities
 
-    radio_velocities = property(_get_radio_velocities)
 
-
-    def _get_optical_velocities(self):
+    @property
+    def optical_velocities(self):
         if self._optical_velocities is None:
             opt_eq = u.doppler_optical(self.wcs.wcs.restfrq * u.Hz)
             self._optical_velocities = self.frequencies.to(u.km / u.s, opt_eq)
 
         return self._optical_velocities
 
-    optical_velocities = property(_get_optical_velocities)
 
     @property
     def frequencies(self):
