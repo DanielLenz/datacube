@@ -6,6 +6,7 @@ from astropy.io import fits
 import astropy.wcs as apywcs
 from astropy import units as u
 
+
 class Datacube(object):
 
     """
@@ -44,47 +45,39 @@ class Datacube(object):
 
         return None
 
-    
     @property
     def data(self):
         if self._hdu.data.dtype != self._dtype:
             self._hdu.data = self._hdu.data.astype(self._dtype)
         return self._hdu.data
 
-    
     @property
     def header(self):
         return self._hdu.header
 
-    
     @property
     def hdu(self):
         return self._hdu
 
-    
     @property
     def wcs(self):
         if self._wcs is None:
             self._wcs = apywcs.WCS(self.header)
         return self._wcs
 
-    
     @property
     def spec_wcs(self):
         return self.wcs.sub(['spectral'])
 
-
     @property
     def cel_wcs(self):
         return self.wcs.sub(['longitude', 'latitude'])
-
 
     @property
     def axis_units(self):
         if self._axis_units is None:
             self._axis_units = [u.Unit(s) for s in self.wcs.wcs.cunit]
         return self._axis_units
-
 
     @property
     def radio_velocities(self):
@@ -94,7 +87,6 @@ class Datacube(object):
 
         return self._radio_velocities
 
-
     @property
     def optical_velocities(self):
         if self._optical_velocities is None:
@@ -103,14 +95,13 @@ class Datacube(object):
 
         return self._optical_velocities
 
-
     @property
     def frequencies(self):
         if self._frequencies is None:
             specax = self.wcs.wcs.spec
 
             channels = np.arange(self.data.shape[::-1][specax])
-            
+
             specc = self.spec_wcs.wcs_pix2world(channels, 0)[0]
             specc *= self.axis_units[specax]
 
@@ -120,15 +111,14 @@ class Datacube(object):
             elif 'VOPT' in self.wcs.wcs.ctype[specax]:
                 eq = u.doppler_optical(self.wcs.wcs.restfrq * u.Hz)
             else:
-                eq = [] # Hope for the best...
+                eq = []  # Hope for the best...
 
             self._frequencies = specc.to(u.Hz, eq)
-        
+
         return self._frequencies
 
 
 class DatacubeMoments(object):
-
 
     def moment(self, vslice=None, cslice=None, kind=0, mask=None):
 
@@ -162,7 +152,6 @@ class DatacubeMoments(object):
 
 
 class EBHISDatacube(Datacube, DatacubeMoments):
-
 
     def __init__(self, *args, **kwargs):
 
