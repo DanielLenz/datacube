@@ -121,12 +121,52 @@ class Datacube(object):
         return self._frequencies
 
 
+    def radio_velocities_to_channels(self, velocities):
+        """
+        Return the corresponding channels to the given radio velocities.
+
+        Parameters
+        ----------
+        velocities : array_like
+            Velocities in km/s or as astropy.Quantity to search for
+
+        Returns
+        -------
+        channels : ndarray
+            The channels for the given velocities
+
+        true_velocities : ndarray
+            The velocities corresponding to the channels
+        """
+
+        # If has unit, convert to radio velocity unit
+        # else use dimensionless values
+        sv = u.Quantity(velocities)
+        if sv.unit is not u.dimensionless_unscaled:
+            sv = sv.to(self.radio_velocities.unit).value
+        else:
+            sv = sv.value
+
+        # If spectral axis is ''reversed'', create sorter array
+        if self.radio_velocities[0] > self.radio_velocities[-1]:
+            sorter = np.arange(self.radio_velocities.size)[::-1]
+        else:
+            sorter = None
+
+        channels = np.searchsorted(self.radio_velocities.value, sv, sorter=sorter)
+
+        true_velocities = self.radio_velocities[channels]
+
+        return channels, true_velocities
+
+
 class DatacubeMoments(object):
 
     def moment(self, vslice=None, cslice=None, kind=0, mask=None):
 
         if vslice is not None:
-            cslice = self.spec_wcs.wcs_world2pix(vslice, 0)[-1]
+            cslice, _ = self.radio_velocities_to_channels(vslice)
+            cslice[-1] += 1
 
         if cslice is not None:
 
