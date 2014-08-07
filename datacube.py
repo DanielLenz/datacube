@@ -19,7 +19,9 @@ class Datacube(object):
 
     _axis_units = None
 
-    _spectral_coordinates = None
+    _frequencies = None
+    _radio_velocities = None
+    _optical_velocities = None
 
     def __init__(self, path=None, data=None, header=None, **kwargs):
 
@@ -92,37 +94,49 @@ class Datacube(object):
 
 
     def _get_radio_velocities(self):
-        specc = self._get_spectral_coordinates()
-        rad_eq = u.doppler_radio(self.wcs.wcs.restfrq * u.Hz)
-        return specc.to(u.km / u.s, equivalencies=rad_eq)
+        if self._radio_velocities is None:
+            rad_eq = u.doppler_radio(self.wcs.wcs.restfrq * u.Hz)
+            self._radio_velocities = self.frequencies.to(u.km / u.s, rad_eq)
+
+        return self._radio_velocities
 
     radio_velocities = property(_get_radio_velocities)
 
 
-    def _get_spectral_coordinates(self):
-        if self._spectral_coordinates is None:
+    def _get_optical_velocities(self):
+        if self._optical_velocities is None:
+            opt_eq = u.doppler_optical(self.wcs.wcs.restfrq * u.Hz)
+            self._optical_velocities = self.frequencies.to(u.km / u.s, opt_eq)
+
+        return self._optical_velocities
+
+    optical_velocities = property(_get_optical_velocities)
+
+    @property
+    def frequencies(self):
+        if self._frequencies is None:
             specax = self.wcs.wcs.spec
-            dataax = self.wcs.wcs.naxis - specax - 1
-            channels = np.arange(self.data.shape[dataax])
-            self._spectral_coordinates = self.spec_wcs.wcs_pix2world(channels, 0)[0]
-            self._spectral_coordinates *= self.axis_units[specax]
+
+            channels = np.arange(self.data.shape[::-1][specax])
+            
+            specc = self.spec_wcs.wcs_pix2world(channels, 0)[0]
+            specc *= self.axis_units[specax]
+
+            # Convert radio or optical velocities to frequencies
+            if 'VRAD' in self.wcs.wcs.ctype[specax]:
+                eq = u.doppler_radio(self.wcs.wcs.restfrq * u.Hz)
+            elif 'VOPT' in self.wcs.wcs.ctype[specax]:
+                eq = u.doppler_optical(self.wcs.wcs.restfrq * u.Hz)
+            else:
+                eq = [] # Hope for the best...
+
+            self._frequencies = specc.to(u.Hz, eq)
         
-        return self._spectral_coordinates
-
-
-class EBHISDatacube(Datacube, DatacubeMoments):
-
-
-    def __init__(self, *args, **kwargs):
-
-        super(EBHISDatacube, self).__init__(*args, **kwargs)
-
-        self._hdu.header['CUNIT3'] = 'm/s'
-        self._hdu.header['CTYPE3'] = 'VRAD'
-        self._hdu.header['SPECSYS'] = 'LSRK'
+        return self._frequencies
 
 
 class DatacubeMoments(object):
+
 
     def moment(self, vslice=None, cslice=None, kind=0, mask=None):
 
@@ -153,3 +167,15 @@ class DatacubeMoments(object):
                 m = np.nansum(s_data * s_velocities * mask, 0)
                 m /= np.nansum(s_data * mask, 0)
                 return m
+
+
+class EBHISDatacube(Datacube, DatacubeMoments):
+
+
+    def __init__(self, *args, **kwargs):
+
+        super(EBHISDatacube, self).__init__(*args, **kwargs)
+
+        self._hdu.header['CUNIT3'] = 'm/s'
+        self._hdu.header['CTYPE3'] = 'VRAD'
+        self._hdu.header['SPECSYS'] = 'LSRK'
