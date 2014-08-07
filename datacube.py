@@ -14,11 +14,13 @@ class Datacube(object):
     """
 
     _wcs = None
-    _hdu = None
+    _data = None
+    _header = None
 
     _dtype = None
 
     _axis_units = None
+    _data_unit = None
 
     _frequencies = None
     _radio_velocities = None
@@ -32,12 +34,15 @@ class Datacube(object):
 
             for h in fits.open(path):
                 if h.is_image:
-                    self._hdu = h
+                    data = h.data
+                    header = h.header
                     break
 
-        elif (data is not None) and (header is not None):
+        if (data is not None) and (header is not None):
 
-            self._hdu = fits.ImageHDU(data=data, header=header)
+            self._data_unit = u.Unit(header['BUNIT'])
+            self.data = data
+            self.header = header
 
         else:
             raise AttributeError(
@@ -47,17 +52,19 @@ class Datacube(object):
 
     @property
     def data(self):
-        if self._hdu.data.dtype != self._dtype:
-            self._hdu.data = self._hdu.data.astype(self._dtype)
-        return self._hdu.data
+        return self._data
+
+    @data.setter
+    def data(self, data):
+        self._data = u.Quantity(data, self._data_unit, self._dtype)
 
     @property
     def header(self):
-        return self._hdu.header
+        return self._header
 
-    @property
-    def hdu(self):
-        return self._hdu
+    @header.setter
+    def header(self, header):
+        self._header = header
 
     @property
     def wcs(self):
