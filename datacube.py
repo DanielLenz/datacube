@@ -113,7 +113,8 @@ class Datacube(object):
             elif 'FREQ' in self.wcs.wcs.ctype[specax]:
                 eq = []
             else:
-                raise AttributeError('Unsupported spectral class {:s} in header.'.format(self.wcs.wcs.ctype[specax]))
+                raise AttributeError(
+                    'Unsupported spectral class {:s} in header.'.format(self.wcs.wcs.ctype[specax]))
 
             self._frequencies = specc.to(u.Hz, eq)
 
