@@ -109,7 +109,21 @@ class Datacube(object):
         
         return self._spectral_coordinates
 
-    
+
+class EBHISDatacube(Datacube, DatacubeMoments):
+
+
+    def __init__(self, *args, **kwargs):
+
+        super(EBHISDatacube, self).__init__(*args, **kwargs)
+
+        self._hdu.header['CUNIT3'] = 'm/s'
+        self._hdu.header['CTYPE3'] = 'VRAD'
+        self._hdu.header['SPECSYS'] = 'LSRK'
+
+
+class DatacubeMoments(object):
+
     def moment(self, vslice=None, cslice=None, kind=0, mask=None):
 
         if vslice is not None:
@@ -139,15 +153,3 @@ class Datacube(object):
                 m = np.nansum(s_data * s_velocities * mask, 0)
                 m /= np.nansum(s_data * mask, 0)
                 return m
-
-
-class EBHISDatacube(Datacube):
-
-
-    def __init__(self, *args, **kwargs):
-
-        super(EBHISDatacube, self).__init__(*args, **kwargs)
-
-        self._hdu.header['CUNIT3'] = 'm/s'
-        self._hdu.header['CTYPE3'] = 'VRAD'
-        self._hdu.header['SPECSYS'] = 'LSRK'
