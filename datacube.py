@@ -82,7 +82,7 @@ class Datacube(object):
     @property
     def radio_velocities(self):
         if self._radio_velocities is None:
-            rad_eq = u.doppler_radio(self.wcs.wcs.restfrq * u.Hz)
+            rad_eq = u.doppler_radio(self.rest_frequency)
             self._radio_velocities = self.frequencies.to(u.km / u.s, rad_eq)
 
         return self._radio_velocities
@@ -90,7 +90,7 @@ class Datacube(object):
     @property
     def optical_velocities(self):
         if self._optical_velocities is None:
-            opt_eq = u.doppler_optical(self.wcs.wcs.restfrq * u.Hz)
+            opt_eq = u.doppler_optical(self.rest_frequency)
             self._optical_velocities = self.frequencies.to(u.km / u.s, opt_eq)
 
         return self._optical_velocities
