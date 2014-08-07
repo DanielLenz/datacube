@@ -107,9 +107,9 @@ class Datacube(object):
 
             # Convert radio or optical velocities to frequencies
             if 'VRAD' in self.wcs.wcs.ctype[specax]:
-                eq = u.doppler_radio(self.wcs.wcs.restfrq * u.Hz)
+                eq = u.doppler_radio(self.rest_frequency)
             elif 'VOPT' in self.wcs.wcs.ctype[specax]:
-                eq = u.doppler_optical(self.wcs.wcs.restfrq * u.Hz)
+                eq = u.doppler_optical(self.rest_frequency)
             elif 'FREQ' in self.wcs.wcs.ctype[specax]:
                 eq = []
             else:
@@ -119,6 +119,10 @@ class Datacube(object):
             self._frequencies = specc.to(u.Hz, eq)
 
         return self._frequencies
+
+    @property
+    def rest_frequency(self):
+        return self.wcs.wcs.restfrq * u.Hz
 
     def radio_velocities_to_channels(self, velocities):
         """
