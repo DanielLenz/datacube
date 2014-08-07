@@ -7,6 +7,13 @@ import astropy.wcs as apywcs
 from astropy import units as u
 
 
+def first_match(keys, d):
+    for k in keys:
+        if k in d:
+            return d[k]
+    raise ValueError('No key in mapping.')
+
+
 class Datacube(object):
 
     """
@@ -14,6 +21,7 @@ class Datacube(object):
     """
 
     _wcs = None
+    _resolution = None
     _data = None
     _header = None
 
@@ -41,6 +49,11 @@ class Datacube(object):
         if (data is not None) and (header is not None):
 
             self._data_unit = u.Unit(header['BUNIT'])
+
+            bmaj = first_match(['BMAJ', 'BMAX'], header)
+            bmin = header['BMIN']
+            self._resolution = u.Quantity([bmaj, bmin], u.deg)
+            
             self.data = data
             self.header = header
 
@@ -64,7 +77,7 @@ class Datacube(object):
 
     @header.setter
     def header(self, header):
-        self._header = header
+        self._header = fits.Header(header)
 
     @property
     def wcs(self):
