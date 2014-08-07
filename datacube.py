@@ -19,7 +19,7 @@ class Datacube(object):
 
     _axis_units = None
 
-    _velocities = None
+    _spectral_coordinates = None
 
     def __init__(self, path=None, data=None, header=None, **kwargs):
 
@@ -84,23 +84,30 @@ class Datacube(object):
 
 
     def _get_axis_units(self):
-        if self._axis_units is None
+        if self._axis_units is None:
             self._axis_units = [u.Unit(s) for s in self.wcs.wcs.cunit]
         return self._axis_units
 
     axis_units = property(_get_axis_units)
 
-    
-    def _get_velocities(self):
-        if (self._velocities is None) or self._calculate_velocities:
-            # unsafe, depends on proper alignment of axes
-            channels = np.arange(self.data.shape[0])
-            self._velocities = self.spec_wcs.wcs_pix2world(channels, 0)[0]
-            self._calculate_velocities = False
 
-        return self._velocities
+    def _get_radio_velocities(self):
+        specc = self._get_spectral_coordinates()
+        rad_eq = u.doppler_radio(self.wcs.wcs.restfrq * u.Hz)
+        return specc.to(u.km / u.s, equivalencies=rad_eq)
 
-    velocities = property(_get_velocities)
+    radio_velocities = property(_get_radio_velocities)
+
+
+    def _get_spectral_coordinates(self):
+        if self._spectral_coordinates is None:
+            specax = self.wcs.wcs.spec
+            dataax = self.wcs.wcs.naxis - specax - 1
+            channels = np.arange(self.data.shape[dataax])
+            self._spectral_coordinates = self.spec_wcs.wcs_pix2world(channels, 0)[0]
+            self._spectral_coordinates *= self.axis_units[specax]
+        
+        return self._spectral_coordinates
 
     
     def moment(self, vslice=None, cslice=None, kind=0, mask=None):
@@ -141,6 +148,6 @@ class EBHISDatacube(Datacube):
 
         super(EBHISDatacube, self).__init__(*args, **kwargs)
 
-        self._hud.header['CUNIT3'] = 'm/s'
+        self._hdu.header['CUNIT3'] = 'm/s'
         self._hdu.header['CTYPE3'] = 'VRAD'
         self._hdu.header['SPECSYS'] = 'LSRK'
