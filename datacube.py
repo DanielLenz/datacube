@@ -48,7 +48,7 @@ class Datacube(object):
                     break
 
         if (data is not None) and (header is not None):
-            
+
             self._data = u.Quantity(data, u.Unit(header['BUNIT']), self._dtype)
             self._header = fits.Header(header)
 
