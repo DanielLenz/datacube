@@ -189,7 +189,7 @@ class Datacube(object):
         Parameters
         ----------
         new_unit : astropy.Unit
-            Brightness-unit compatible unit to convert
+            Compatible unit to convert
             the data to.
         """
         # Hack since self.resolution.prod() is not

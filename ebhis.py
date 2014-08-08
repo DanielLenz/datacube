@@ -8,6 +8,6 @@ class EBHISDatacube(Datacube, DatacubeMoments):
 
         super(EBHISDatacube, self).__init__(*args, **kwargs)
 
-        self._hdu.header['CUNIT3'] = 'm/s'
-        self._hdu.header['CTYPE3'] = 'VRAD'
-        self._hdu.header['SPECSYS'] = 'LSRK'
+        self.header['CUNIT3'] = 'm/s'
+        self.header['CTYPE3'] = 'VRAD'
+        self.header['SPECSYS'] = 'LSRK'
