@@ -28,7 +28,6 @@ class Datacube(object):
     _dtype = None
 
     _axis_units = None
-    _data_unit = None
 
     _frequencies = None
     _radio_velocities = None
@@ -47,11 +46,9 @@ class Datacube(object):
                     break
 
         if (data is not None) and (header is not None):
-
-            self._data_unit = u.Unit(header['BUNIT'])
             
-            self.data = data
-            self.header = header
+            self._data = u.Quantity(data, u.Unit(header['BUNIT']), self._dtype)
+            self._header = fits.Header(header)
 
         else:
             raise AttributeError(
@@ -63,17 +60,9 @@ class Datacube(object):
     def data(self):
         return self._data
 
-    @data.setter
-    def data(self, data):
-        self._data = u.Quantity(data, self._data_unit, self._dtype)
-
     @property
     def header(self):
         return self._header
-
-    @header.setter
-    def header(self, header):
-        self._header = fits.Header(header)
 
     @property
     def hdu(self):
@@ -188,3 +177,24 @@ class Datacube(object):
         true_velocities = self.radio_velocities[channels]
 
         return channels, true_velocities
+
+    def convert_brightness_unit(self, new_unit):
+        """
+        Convert the data cube's brightness unit to the
+        given new unit. The data are converted in-place
+        and the header is updated to reflect the conversion.
+
+        Parameters
+        ----------
+        new_unit : astropy.Unit
+            Brightness-unit compatible unit to convert
+            the data to.
+        """
+        # Hack since self.resolution.prod() is not
+        # supported by astropy for whatever reason.
+        res = self.resolution
+        bunit_eq = u.brightness_temperature(
+            np.pi * res[0] * res[1], self.rest_frequency)
+
+        self._data = self._data.to(new_unit, bunit_eq)
+        self._header['BUINT'] = self._data.unit.to_string('fits')
