@@ -68,7 +68,7 @@ class Datacube(object):
 
     @property
     def hdu(self):
-        return fits.ImageHDU(self.data.value, self.header)
+        return fits.PrimaryHDU(self.data.value, self.header)
 
     @property
     def resolution(self):
