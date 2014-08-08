@@ -58,3 +58,28 @@ class DatacubeMoments(object):
                 m = np.nansum(s_data * s_velocities * mask, 0)
                 m /= np.nansum(s_data * mask, 0)
                 return m
+
+
+class DatacubeSpectra(object):
+
+    def pixel_spectrum(self):
+        """
+        Get spectrum from nearest pixel to a given
+        celestial position.
+        """
+        pass
+
+
+    def peak_spectrum(self):
+        """
+        Get spectrum for a point source corrected
+        for beam smearing.
+        """
+        pass
+
+
+    def integrated_spectrum(self):
+        """
+        Get spectrum integrated over a provided 2D or 3D mask.
+        """
+        pass
