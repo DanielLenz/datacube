@@ -6,6 +6,8 @@ from astropy.io import fits
 import astropy.wcs as apywcs
 from astropy import units as u
 
+from .utilities import brightness_temperature_jybeam
+
 
 def first_match(keys, d):
     for k in keys:
@@ -66,7 +68,7 @@ class Datacube(object):
 
     @property
     def hdu(self):
-        return fits.ImageHDU(self.data, self.header)
+        return fits.ImageHDU(self.data.value, self.header)
 
     @property
     def resolution(self):
@@ -193,8 +195,8 @@ class Datacube(object):
         # Hack since self.resolution.prod() is not
         # supported by astropy for whatever reason.
         res = self.resolution
-        bunit_eq = u.brightness_temperature(
-            np.pi * res[0] * res[1], self.rest_frequency)
+        bunit_eq = brightness_temperature_jybeam(
+            np.pi * res[0] * res[1] / 4. / np.log(2), self.rest_frequency)
 
         self._data = self._data.to(new_unit, bunit_eq)
-        self._header['BUINT'] = self._data.unit.to_string('fits')
+        self._header['BUNIT'] = self._data.unit.to_string('fits')
