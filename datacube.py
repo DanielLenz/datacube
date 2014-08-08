@@ -70,8 +70,8 @@ class Datacube(object):
 
     @property
     def resolution(self):
-        bmaj = first_match(['BMAJ', 'BMAX'], header)
-        bmin = header['BMIN']
+        bmaj = first_match(['BMAJ', 'BMAX'], self._header)
+        bmin = self._header['BMIN']
         return u.Quantity([bmaj, bmin], u.deg)
 
     @property
