@@ -49,10 +49,6 @@ class Datacube(object):
         if (data is not None) and (header is not None):
 
             self._data_unit = u.Unit(header['BUNIT'])
-
-            bmaj = first_match(['BMAJ', 'BMAX'], header)
-            bmin = header['BMIN']
-            self._resolution = u.Quantity([bmaj, bmin], u.deg)
             
             self.data = data
             self.header = header
@@ -82,6 +78,12 @@ class Datacube(object):
     @property
     def hdu(self):
         return fits.ImageHDU(self.data, self.header)
+
+    @property
+    def resolution(self):
+        bmaj = first_match(['BMAJ', 'BMAX'], header)
+        bmin = header['BMIN']
+        return u.Quantity([bmaj, bmin], u.deg)
 
     @property
     def wcs(self):
