@@ -80,6 +80,10 @@ class Datacube(object):
         self._header = fits.Header(header)
 
     @property
+    def hdu(self):
+        return fits.ImageHDU(self.data, self.header)
+
+    @property
     def wcs(self):
         if self._wcs is None:
             self._wcs = apywcs.WCS(self.header)
