@@ -53,7 +53,7 @@ class DatacubeMoments(object):
                 return np.nansum(s_data * mask, 0)
 
             if kind == 1:
-                s_velocities = self.velocities[data_slice][:, None, None]
+                s_velocities = self.radio_velocities[data_slice][:, None, None]
 
                 m = np.nansum(s_data * s_velocities * mask, 0)
                 m /= np.nansum(s_data * mask, 0)
