@@ -6,14 +6,7 @@ from astropy.io import fits
 import astropy.wcs as apywcs
 from astropy import units as u
 
-from .utilities import brightness_temperature_jybeam
-
-
-def first_match(keys, d):
-    for k in keys:
-        if k in d:
-            return d[k]
-    raise ValueError('No key in mapping.')
+from .utilities import brightness_temperature_jybeam, first_match
 
 
 class Datacube(object):
