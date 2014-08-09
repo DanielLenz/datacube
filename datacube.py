@@ -70,6 +70,11 @@ class Datacube(object):
         return u.Quantity([bmaj, bmin], u.deg)
 
     @property
+    def pixelsize(self):
+        return u.Quantity(
+            [np.abs(v) for v in self.cel_wcs.wcs.cdelt], u.deg)
+
+    @property
     def wcs(self):
         if self._wcs is None:
             self._wcs = apywcs.WCS(self.header)
@@ -187,11 +192,12 @@ class Datacube(object):
         """
         # Hack since self.resolution.prod() is not
         # supported by astropy for whatever reason.
+        
         res = self.resolution
-        pixelarea = u.Quantity(np.abs(self.header['CDELT1']), u.deg)
-            * u.Quantity(np.abs(self.header['CDELT2']), u.deg)
+        pix = self.pixelsize
+        
         bunit_eq = brightness_temperature_jybeam(
-            pixelarea,
+            pix[0] * pix[1],
             np.pi * res[0] * res[1] / 4. / np.log(2),
             self.rest_frequency)
 
