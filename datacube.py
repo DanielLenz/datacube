@@ -188,8 +188,12 @@ class Datacube(object):
         # Hack since self.resolution.prod() is not
         # supported by astropy for whatever reason.
         res = self.resolution
+        pixelarea = u.Quantity(np.abs(self.header['CDELT1']), u.deg)
+            * u.Quantity(np.abs(self.header['CDELT2']), u.deg)
         bunit_eq = brightness_temperature_jybeam(
-            np.pi * res[0] * res[1] / 4. / np.log(2), self.rest_frequency)
+            pixelarea,
+            np.pi * res[0] * res[1] / 4. / np.log(2),
+            self.rest_frequency)
 
         self._data = self._data.to(new_unit, bunit_eq)
         self._header['BUNIT'] = self._data.unit.to_string('fits')
