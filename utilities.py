@@ -25,9 +25,16 @@ def brightness_temperature_jybeam(pixel_area, beam_area, rest_frequency):
         factor = (u.Jy / (2 * const.k_B * nu**2 / const.c**2)).to(u.K).value
         return (x_K * pixel / factor)
 
+    def convert_Jyb_to_Jyp(x_jybm):
+        return x_jybm * pixel / beam
+
+    def convert_Jyp_to_Jyb(x_jyp):
+        return x_jyp * beam / pixel
+
     return [
         (u.Jy / u.beam, u.K, convert_Jyb_to_K, convert_K_to_Jyb),
-        (u.Jy / u.pixel, u.K, convert_Jyb_to_K, convert_K_to_Jyb)
+        (u.Jy / u.pixel, u.K, convert_Jyp_to_K, convert_K_to_Jyp),
+        (u.Jy / u.pixel, u.Jy / u.beam, convert_Jyp_to_Jyb, convert_Jyb_to_Jyp),
     ]
 
 
