@@ -90,7 +90,7 @@ class Datacube(object):
 
     @property
     def frame(self):
-        if self.wcs.wcs.lattyp == 'GLON':
+        if self.wcs.wcs.lngtyp == 'GLON':
             return 'galactic'
         else:
             return 'icrs'
@@ -212,10 +212,10 @@ class Datacube(object):
                 Jy / pixel
                 K
         """
-        
+
         res = self.resolution
         pix = self.pixelsize
-        
+
         bunit_eq = brightness_temperature_jybeam(
             pix[0] * pix[1],
             np.pi * res[0] * res[1] / 4. / np.log(2),

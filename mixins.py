@@ -1,6 +1,9 @@
 import numpy as np
 import itertools as it
 
+from astropy import units as u
+from astropy.coordinates import SkyCoord
+
 
 class DatacubeMoments(object):
 
@@ -62,24 +65,48 @@ class DatacubeMoments(object):
 
 class DatacubeSpectra(object):
 
-    def pixel_spectrum(self):
+    def _get_spectra(self, lon, lat):
+        pixels = self.cel_wcs.wcs_world2pix(np.column_stack((lon, lat)), 0)
+        return u.Quantity([self.data[:, int(round(y)), int(round(x))] for x, y in pixels])
+
+    def pixel_spectrum(self, coordinates):
         """
         Get spectrum from nearest pixel to a given
         celestial position.
+
+        Parameters
+        ----------
+        coordinates : astropy.coordinates.SkyCoord
+            Coordinates of the spectrum to extract. Supports
+            multiple spectra extraction at once through vector
+            coordinates.
+
+        Returns
+        -------
+        spectra : astropy.units.Quantity
+            Extracted spectra
         """
-        pass
+        c = coordinates.transform_to(self.frame)
 
+        lon = c.spherical.lon.to(self.lon_unit).value
+        lat = c.spherical.lat.to(self.lat_unit).value
 
-    def peak_spectrum(self):
+        spectra = self._get_spectra(lon, lat)
+
+        if isinstance(lon, float):
+            return spectra[0]
+        else:
+            return spectra
+
+    def peak_spectrum(self, ):
         """
         Get spectrum for a point source corrected
-        for beam smearing.
+        for pixel sampling.
         """
-        pass
+        raise NotImplementedError()
 
-
-    def integrated_spectrum(self):
+    def integrated_spectrum(self, mask):
         """
         Get spectrum integrated over a provided 2D or 3D mask.
         """
-        pass
+        raise NotImplementedError()

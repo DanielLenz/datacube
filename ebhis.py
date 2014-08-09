@@ -1,8 +1,8 @@
 from .datacube import Datacube
-from .mixins import DatacubeMoments
+from .mixins import DatacubeMoments, DatacubeSpectra
 
 
-class EBHISDatacube(Datacube, DatacubeMoments):
+class EBHISDatacube(Datacube, DatacubeMoments, DatacubeSpectra):
 
     def __init__(self, *args, **kwargs):
 
