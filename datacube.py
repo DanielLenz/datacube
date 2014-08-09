@@ -89,6 +89,13 @@ class Datacube(object):
         return self.wcs.sub(['longitude', 'latitude'])
 
     @property
+    def frame(self):
+        if self.wcs.wcs.lattyp == 'GLON':
+            return 'galactic'
+        else:
+            return 'icrs'
+
+    @property
     def axis_units(self):
         if self._axis_units is None:
             self._axis_units = [u.Unit(s) for s in self.wcs.wcs.cunit]
