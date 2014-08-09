@@ -17,3 +17,10 @@ def brightness_temperature_jybeam(beam_area, disp):
         return (x_K * beam / factor)
 
     return [(u.Jy / u.beam, u.K, convert_Jy_to_K, convert_K_to_Jy)]
+
+
+def first_match(keys, d):
+    for k in keys:
+        if k in d:
+            return d[k]
+    raise ValueError('No key in mapping.')
