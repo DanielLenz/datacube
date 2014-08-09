@@ -142,6 +142,8 @@ class Datacube(object):
     def radio_velocities_to_channels(self, velocities):
         """
         Return the corresponding channels to the given radio velocities.
+        The functions uses a binary search and will return the last channel
+        with a velocity smaller than the requested one.
 
         Parameters
         ----------
@@ -195,8 +197,6 @@ class Datacube(object):
                 Jy / pixel
                 K
         """
-        # Hack since self.resolution.prod() is not
-        # supported by astropy for whatever reason.
         
         res = self.resolution
         pix = self.pixelsize
