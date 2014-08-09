@@ -102,6 +102,14 @@ class Datacube(object):
         return self._axis_units
 
     @property
+    def lon_unit(self):
+        return self.axis_units[self.wcs.wcs.lng]
+
+    @property
+    def lat_unit(self):
+        return self.axis_units[self.wcs.wcs.lat]
+
+    @property
     def radio_velocities(self):
         if self._radio_velocities is None:
             rad_eq = u.doppler_radio(self.rest_frequency)
