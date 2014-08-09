@@ -189,6 +189,11 @@ class Datacube(object):
         new_unit : astropy.Unit
             Compatible unit to convert
             the data to.
+
+            Supported units:
+                Jy / beam
+                Jy / pixel
+                K
         """
         # Hack since self.resolution.prod() is not
         # supported by astropy for whatever reason.
