@@ -89,6 +89,24 @@ class Datacube(object):
         return self.wcs.sub(['longitude', 'latitude'])
 
     @property
+    def cel_header(self):
+        self._cel_header = self._header.copy()
+       
+        for keyword in self._cel_header['*3']:
+            try:
+                del self._cel_header[keyword]
+            except:
+                pass
+
+            try:
+                self._cel_header['NAXIS'] = 2
+            except:
+                pass
+
+        return self._cel_header
+
+
+    @property
     def frame(self):
         if self.wcs.wcs.lngtyp == 'GLON':
             return 'galactic'
