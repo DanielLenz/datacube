@@ -1,5 +1,3 @@
-import itertools as it
-
 import numpy as np
 
 from astropy.io import fits
@@ -99,7 +97,6 @@ class Datacube(object):
 
         return self._cel_header
 
-
     @property
     def frame(self):
         if self.wcs.wcs.lngtyp == 'GLON':
@@ -144,8 +141,9 @@ class Datacube(object):
 
             channels = np.arange(self.data.shape[::-1][specax])
 
-            specc = self.spec_wcs.wcs_pix2world(channels, 0)[0]
-            specc *= self.axis_units[specax]
+            spec = self.spec_wcs.wcs_pix2world(channels, 0)[0]
+
+            specc = spec * self.axis_units[specax]
 
             # Convert radio or optical velocities to frequencies
             if 'VRAD' in self.wcs.wcs.ctype[specax]:
