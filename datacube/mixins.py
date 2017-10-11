@@ -40,7 +40,7 @@ class DatacubeMoments(object):
         if cslice is not None:
 
             cslice = [int(f(c))
-                      for f, c in it.izip([np.floor, np.ceil], cslice)]
+                      for f, c in it.zip([np.floor, np.ceil], cslice)] #while running this code in python3 I encountered "AttributeError: module 'itertools' has no attribute 'izip'". Many queries in the stackoverflow suggests to remove "i" from the "izip". I am novice to the python so excuse me if i suggested something wrong. 
             data_slice = slice(*cslice)
 
             if mask is None:
